@@ -10,12 +10,14 @@ app = Flask(
 )
 CORS(app)
 
+@app.route("/Assets/<path:filename>")
+def serve_assets(filename):
+    return send_from_directory(os.path.join(os.getcwd(), "Assets"), filename)
 
-
-# - Endpoint to Handle Delivery Module
 @app.route('/api/<course_id>/delivery/', methods = ['GET', 'POST'])
 def delivery(course_id):
     if request.method == 'GET':
+       
         # - Get Related Args
         lesson_id = request.args.get("lesson_id")
         user_id = request.args.get("user_id")
@@ -27,6 +29,7 @@ def delivery(course_id):
             return jsonify({"error": "Conversation file not found"}), 404
         with open(json_file_path, 'r') as file:
             conversation_data = file.read()
+        
         return jsonify({
             "course_id": course_id,
             "data": conversation_data
@@ -97,3 +100,10 @@ def update_profile():
         return jsonify({
             "error": "Method not allowed"
         }), 405
+    
+
+    # --------------------------
+# - Run Flask Server
+# --------------------------
+if __name__ == "__main__":
+    app.run(debug=True)
